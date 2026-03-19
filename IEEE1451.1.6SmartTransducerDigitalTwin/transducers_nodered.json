@@ -1,0 +1,285 @@
+[
+    {
+        "id": "c8be74243b86f2f1",
+        "type": "tab",
+        "label": "Smart Transducer",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1f4a5f7805651227",
+        "type": "mqtt in",
+        "z": "c8be74243b86f2f1",
+        "name": "_1451.1.6/D0/SMARTSENSOR",
+        "topic": "_1451.1.6/D0/SMARTSENSOR",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "cdf78fdef9bd8a15",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "14220ee2d1109d02"
+            ]
+        ]
+    },
+    {
+        "id": "8ef2aade32880436",
+        "type": "mqtt out",
+        "z": "c8be74243b86f2f1",
+        "name": "_1451.1.6/D0/SMARTSENSOR",
+        "topic": "_1451.1.6/D0/SMARTSENSOR",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "cdf78fdef9bd8a15",
+        "x": 1290,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "f75111140a6872b2",
+        "type": "mqtt in",
+        "z": "c8be74243b86f2f1",
+        "name": "_1451.1.6/D0/SMARTACTUATOR",
+        "topic": "_1451.1.6/D0/SMARTACTUATOR",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "cdf78fdef9bd8a15",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 360,
+        "y": 460,
+        "wires": [
+            [
+                "30b50e845708f259"
+            ]
+        ]
+    },
+    {
+        "id": "f75ee68c48850668",
+        "type": "function",
+        "z": "c8be74243b86f2f1",
+        "name": "write",
+        "func": "let tempVal = flow.get('lastTempVal');\nif (typeof tempVal !== 'number') {\n    tempVal = 26; // default starting point\n}\n\nif (tempVal < 25) {\n    tempVal += 1;\n} else if (tempVal > 27) {\n    tempVal -= 1;\n}\nflow.set('lastTempVal', tempVal);\n\n// servorep = { # actuator movement reply(confirmation)\n//   \"netSvcType\": 2, # transducer access services\n//   \"netSvcId\": 7, # write to channel of TIM\n//   \"msgType\": 2, # reply\n//   \"msgLength\": 52, # bytes\n//   \"errorCode\": 0,\n//     \"appId\": appId,\n//     \"ncapId\": servoId,\n//     \"timId\": rpiId,\n//     \"channelId\": 1,\n// }\n\nvar buf = new Buffer(56);\nbuf[0] = 2; // netSvcType\nbuf[1] = 7; // netSvcId\nbuf[2] = 2; // msgType\nbuf[3] = 52; // msgLength\nbuf[4] = 0; // errorCode 0\nbuf[5] = 0; // 1\nbuf[6]  = 0x04; // UUID appId 0\nbuf[7]  = 0x10; // 1\nbuf[8]  = 0x00; // 2\nbuf[9]  = 0x00; // 3\nbuf[10] = 0x27; // 4\nbuf[11] = 0x00; // 5\nbuf[12] = 0x00; // 6\nbuf[13] = 0x4D; // 7\nbuf[14] = 0x00; // 8\nbuf[15] = 0x00; // 9\nbuf[16] = 0x00; // 10\nbuf[17] = 0x07; // 11\nbuf[18] = 0xE9; // 12\nbuf[19] = 0x00; // 13\nbuf[20] = 0x00; // 14\nbuf[21] = 0x00; // 15\nbuf[22] = 0x04; // UUID ncapId 0\nbuf[23] = 0x10; // 1\nbuf[24] = 0x00; // 2\nbuf[25] = 0x00; // 3\nbuf[26] = 0x27; // 4\nbuf[27] = 0x00; // 5\nbuf[28] = 0x00; // 6\nbuf[29] = 0x4D; // 7\nbuf[30] = 0x00; // 8\nbuf[31] = 0x00; // 9\nbuf[32] = 0x03; // 10\nbuf[33] = 0x07; // 11\nbuf[34] = 0xE9; // 12\nbuf[35] = 0x00; // 13\nbuf[36] = 0x00; // 14\nbuf[37] = 0x00; // 15\nbuf[38] = 0x04; // UUID timId 0\nbuf[39] = 0x10; // 1\nbuf[40] = 0x00; // 2\nbuf[41] = 0x00; // 3\nbuf[42] = 0x27; // 4\nbuf[43] = 0x00; // 5\nbuf[44] = 0x00; // 6\nbuf[45] = 0x4D; // 7\nbuf[46] = 0x00; // 8\nbuf[47] = 0x00; // 9\nbuf[48] = 0x01; // 10\nbuf[49] = 0x07; // 11\nbuf[50] = 0xE9; // 12\nbuf[51] = 0x00; // 13\nbuf[52] = 0x00; // 14\nbuf[53] = 0x00; // 15\nbuf[54] = 1; // channelId 0\nbuf[55] = 0; // 1\n\nmsg.payload = buf;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 460,
+        "wires": [
+            [
+                "0f6a40cab3dd859b",
+                "a63c6a4ce16fac8f"
+            ]
+        ]
+    },
+    {
+        "id": "0f6a40cab3dd859b",
+        "type": "mqtt out",
+        "z": "c8be74243b86f2f1",
+        "name": "_1451.1.6/D0/SMARTACTUATOR",
+        "topic": "_1451.1.6/D0/SMARTACTUATOR",
+        "qos": "1",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "cdf78fdef9bd8a15",
+        "x": 1320,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "4b87b106541afc7f",
+        "type": "function",
+        "z": "c8be74243b86f2f1",
+        "name": "read_temp",
+        "func": "const now = Date.now();\nconst seconds = Math.floor(now / 1000);\nconst nanoseconds = (now % 1000) * 1e6;\n\nconst tbuf = Buffer.alloc(10);\ntbuf.writeUIntBE(seconds, 0, 6);\ntbuf.writeUInt32BE(nanoseconds, 6);\n\nlet tempVal = flow.get('lastTempVal');\nif (typeof tempVal !== 'number') {\n    tempVal = 26;  // default starting value\n}\n\n// Apply random adjustment\nconst rand = Math.random();\nif (rand <= 0.2) {\n    tempVal = tempVal - .5;\n}\nelse if (rand <= 0.4) {\n    tempVal = tempVal - 0.25;\n}\nelse if (rand <= .6) {\n    tempVal = tempVal;\n}\nelse if (rand <= 0.8) {\n    tempVal = tempVal + 0.25;\n}\nelse {\n    tempVal = tempVal + .5;\n}\n\n// Store updated value for next run\nflow.set('lastTempVal', tempVal);\n\n// sensorrep = { # sensor read reply (data)\n//   \"netSvcType\" : 2, # trasducer access services\n//   \"netSvcId\" : 1, # read from channel of TIM\n//   \"msgType\" : 2, # reply\n//   \"msgLength\" : 78, # bytes\n//   \"errorCode\" : 0,\n//   \"appId\" : appId,\n//   \"ncapId\" : sensorId,\n//   \"timId\" : rpiId,\n//   \"channelId\" : 1,\n//   \"transducerSampleData\" : str(read_temp()),\n//   \"timestamp\" : None\n// }   \n\nvar buf = new Buffer(82);\nbuf[0] = 2; // netSvcType\nbuf[1] = 1; // netSvcId\nbuf[2] = 2; // msgType\nbuf[3] = 78; // msgLength\nbuf[4] = 0; // errorCode 0\nbuf[5] = 0; // 1\nbuf[6]  = 0x04; // UUID appId 0\nbuf[7]  = 0x10; // 1\nbuf[8]  = 0x00; // 2\nbuf[9]  = 0x00; // 3\nbuf[10] = 0x27; // 4\nbuf[11] = 0x00; // 5\nbuf[12] = 0x00; // 6\nbuf[13] = 0x4D; // 7\nbuf[14] = 0x00; // 8\nbuf[15] = 0x00; // 9\nbuf[16] = 0x00; // 10\nbuf[17] = 0x07; // 11\nbuf[18] = 0xE9; // 12\nbuf[19] = 0x00; // 13\nbuf[20] = 0x00; // 14\nbuf[21] = 0x00; // 15\nbuf[22] = 0x04; // UUID ncapId 0\nbuf[23] = 0x10; // 1\nbuf[24] = 0x00; // 2\nbuf[25] = 0x00; // 3\nbuf[26] = 0x27; // 4\nbuf[27] = 0x00; // 5\nbuf[28] = 0x00; // 6\nbuf[29] = 0x4D; // 7\nbuf[30] = 0x00; // 8\nbuf[31] = 0x00; // 9\nbuf[32] = 0x02; // 10\nbuf[33] = 0x07; // 11\nbuf[34] = 0xE9; // 12\nbuf[35] = 0x00; // 13\nbuf[36] = 0x00; // 14\nbuf[37] = 0x00; // 15\nbuf[38] = 0x04; // UUID timId 0\nbuf[39] = 0x10; // 1\nbuf[40] = 0x00; // 2\nbuf[41] = 0x00; // 3\nbuf[42] = 0x27; // 4\nbuf[43] = 0x00; // 5\nbuf[44] = 0x00; // 6\nbuf[45] = 0x4D; // 7\nbuf[46] = 0x00; // 8\nbuf[47] = 0x00; // 9\nbuf[48] = 0x01; // 10\nbuf[49] = 0x07; // 11\nbuf[50] = 0xE9; // 12\nbuf[51] = 0x00; // 13\nbuf[52] = 0x00; // 14\nbuf[53] = 0x00; // 15\nbuf[54] = 1; // channelId 0\nbuf[55] = 0; // 1\nbuf[56] = 0; // transducerSampleData 0\nbuf[57] = 0; // 1\nbuf[58] = 0; // 2\nbuf[59] = 0; // 3\nbuf[60] = 0; // 4\nbuf[61] = 0; // 5\nbuf[62] = 0; // 6\nbuf[63] = 0; // 7\nbuf[64] = 0; // 8\nbuf[65] = 0; // 9\nbuf[66] = 0; // 10\nbuf[67] = 0; // 11\nbuf[68] = 0; // 12\nbuf[69] = 0; // 13\nbuf[70] = 0; // 14\nbuf[71] = 0; // 15\nbuf[72] = 0; // timestamp 0\nbuf[73] = 0; // 1\nbuf[74] = 0; // 2\nbuf[75] = 0; // 3\nbuf[76] = 0; // 4\nbuf[77] = 0; // 5\nbuf[78] = 0; // 6\nbuf[79] = 0; // 7\nbuf[80] = 0; // 8\nbuf[81] = 0; // 9\n\nbuf.writeDoubleBE(tempVal, 56); // write transducerSampleData\ntbuf.copy(buf, 72); // write timestamp\nmsg.payload = buf;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 240,
+        "wires": [
+            [
+                "8ef2aade32880436",
+                "2ef176eeeedb741d"
+            ]
+        ]
+    },
+    {
+        "id": "40291ca1d2ef4a71",
+        "type": "switch",
+        "z": "c8be74243b86f2f1",
+        "name": "check msgType",
+        "property": "typeId",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "2,1,1",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 800,
+        "y": 240,
+        "wires": [
+            [
+                "4b87b106541afc7f"
+            ]
+        ]
+    },
+    {
+        "id": "ee4756d3c1fc6bc9",
+        "type": "switch",
+        "z": "c8be74243b86f2f1",
+        "name": "check msgType",
+        "property": "typeId",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "2,7,1",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 820,
+        "y": 460,
+        "wires": [
+            [
+                "f75ee68c48850668"
+            ]
+        ]
+    },
+    {
+        "id": "2ef176eeeedb741d",
+        "type": "debug",
+        "z": "c8be74243b86f2f1",
+        "name": "sensorrep debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "a63c6a4ce16fac8f",
+        "type": "debug",
+        "z": "c8be74243b86f2f1",
+        "name": "servorep debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1260,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "14220ee2d1109d02",
+        "type": "function",
+        "z": "c8be74243b86f2f1",
+        "name": "Array2Str",
+        "func": "msg.typeId = Object.values(msg.payload).slice(0, 3).join(\",\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 240,
+        "wires": [
+            [
+                "40291ca1d2ef4a71"
+            ]
+        ]
+    },
+    {
+        "id": "30b50e845708f259",
+        "type": "function",
+        "z": "c8be74243b86f2f1",
+        "name": "Array2Str",
+        "func": "msg.typeId = Object.values(msg.payload).slice(0, 3).join(\",\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 600,
+        "y": 460,
+        "wires": [
+            [
+                "ee4756d3c1fc6bc9"
+            ]
+        ]
+    },
+    {
+        "id": "cdf78fdef9bd8a15",
+        "type": "mqtt-broker",
+        "name": "HiveMQTT",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    }
+]

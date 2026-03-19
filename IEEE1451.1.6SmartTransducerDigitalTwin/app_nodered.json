@@ -1,0 +1,777 @@
+[
+    {
+        "id": "dbbfb8a1ee1c3552",
+        "type": "tab",
+        "label": "APP",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "bb968932c9897e47",
+        "type": "mqtt out",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "_1451.1.6/D0/SMARTSENSOR",
+        "topic": "_1451.1.6/D0/SMARTSENSOR",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "cdf78fdef9bd8a15",
+        "x": 1350,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "52388ed775fdbf63",
+        "type": "inject",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "sensorreq",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "dummy",
+        "payloadType": "str",
+        "x": 510,
+        "y": 460,
+        "wires": [
+            [
+                "7f79d7b26ffb16fa"
+            ]
+        ]
+    },
+    {
+        "id": "1a8c255963d0b643",
+        "type": "mqtt out",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "_1451.1.6/D0/SMARTACTUATOR",
+        "topic": "_1451.1.6/D0/SMARTACTUATOR",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "cdf78fdef9bd8a15",
+        "x": 2060,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "bf017430e386f6e6",
+        "type": "mqtt in",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "_1451.1.6/D0/SMARTSENSOR",
+        "topic": "_1451.1.6/D0/SMARTSENSOR",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "cdf78fdef9bd8a15",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 570,
+        "y": 680,
+        "wires": [
+            [
+                "cf73446b8881a138"
+            ]
+        ]
+    },
+    {
+        "id": "57e2153478cc1694",
+        "type": "mqtt in",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "_1451.1.6/D0/SMARTACTUATOR",
+        "topic": "_1451.1.6/D0/SMARTACTUATOR",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "cdf78fdef9bd8a15",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 580,
+        "y": 240,
+        "wires": [
+            [
+                "5b98a4121de759b6"
+            ]
+        ]
+    },
+    {
+        "id": "14916c6ba005df38",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "parse temp",
+        "func": "msg.tempVal = msg.payload.readDoubleBE(56);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1150,
+        "y": 680,
+        "wires": [
+            [
+                "582501f665471b3d",
+                "ef614776a2a2047e",
+                "d0f926a2de72d198",
+                "1cce5cba26e23059"
+            ]
+        ]
+    },
+    {
+        "id": "7f79d7b26ffb16fa",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "sensorreq report pub thru",
+        "func": "// sensorreq = { # sensor data request\n//   \"netSvcType\" :  2, # transducer access services\n//   \"setSvcId\" : 1, # read from channel of TIM\n//   \"msgType\" : 1, # command\n//   \"msgLength\" : 61, # bytes\n//   \"appId\" : appId,\n//   \"ncapId\" : sensorId,\n//   \"timId\" : rpiId,\n//   \"channelId\" : 1,\n//   \"samplingMode\" : 5, # continuous\n//   \"timeout\" : 60,\n// }\n\nvar buf = new Buffer(65);\nbuf[0] = 2; // netSvcType\nbuf[1] = 1; // netSvcId\nbuf[2] = 1; // msgType\nbuf[3] = 61; // msgLength\nbuf[4] = 0x04; // UUID appId 0\nbuf[5] = 0x10; // 1\nbuf[6] = 0x00; // 2\nbuf[7] = 0x00; // 3\nbuf[8] = 0x27; // 4\nbuf[9] = 0x00; // 5\nbuf[10] = 0x00; // 6\nbuf[11] = 0x4D; // 7\nbuf[12] = 0x00; // 8\nbuf[13] = 0x00; // 9\nbuf[14] = 0x00; // 10\nbuf[15] = 0x07; // 11\nbuf[16] = 0xE9; // 12\nbuf[17] = 0x00; // 13\nbuf[18] = 0x00; // 14\nbuf[19] = 0x00; // 15\nbuf[20] = 0x04; // UUID ncapId 0\nbuf[21] = 0x10; // 1\nbuf[22] = 0x00; // 2\nbuf[23] = 0x00; // 3\nbuf[24] = 0x27; // 4\nbuf[25] = 0x00; // 5\nbuf[26] = 0x00; // 6\nbuf[27] = 0x4D; // 7\nbuf[28] = 0x00; // 8\nbuf[29] = 0x00; // 9\nbuf[30] = 0x02; // 10\nbuf[31] = 0x07; // 11\nbuf[32] = 0xE9; // 12\nbuf[33] = 0x00; // 13\nbuf[34] = 0x00; // 14\nbuf[35] = 0x00; // 15\nbuf[36] = 0x04; // UUID timId 0\nbuf[37] = 0x10; // 1\nbuf[38] = 0x00; // 2\nbuf[39] = 0x00; // 3\nbuf[40] = 0x27; // 4\nbuf[41] = 0x00; // 5\nbuf[42] = 0x00; // 6\nbuf[43] = 0x4D; // 7\nbuf[44] = 0x00; // 8\nbuf[45] = 0x00; // 9\nbuf[46] = 0x01; // 10\nbuf[47] = 0x07; // 11\nbuf[48] = 0xE9; // 12\nbuf[49] = 0x00; // 13\nbuf[50] = 0x00; // 14\nbuf[51] = 0x00; // 15\nbuf[52] = 1; // channelId 0\nbuf[53] = 0; // 1\nbuf[54] = 5; // samplingMode 0\nbuf[55] = 0x00 // timeout 0\nbuf[56] = 0x3C // 1\nbuf[57] = 0; // 2\nbuf[58] = 0; // 3\nbuf[59] = 0; // 4\nbuf[60] = 0; // 5\nbuf[61] = 0; // 6\nbuf[62] = 0; // 7\nbuf[63] = 0; // 8\nbuf[64] = 0; // 9\n\nmsg.payload = buf;\nmsg.report = \"<br>Smart sensor request published.\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 810,
+        "y": 460,
+        "wires": [
+            [
+                "540dbf01c28202b6",
+                "33d9aab6a34de767"
+            ]
+        ]
+    },
+    {
+        "id": "582501f665471b3d",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "update graph",
+        "func": "let start = flow.get(\"start\") || Date.now();\nflow.set(\"start\", start);\n\nlet elapsed = ((Date.now() - start) / 1000).toFixed(1);\n\nlet chartData = flow.get(\"chartData\") || {};\n\nchartData.temperature = chartData.temperature || [];\nchartData.upper_threshold = chartData.upper_threshold || [];\nchartData.lower_threshold = chartData.lower_threshold || [];\nchartData.labels = chartData.labels || [];\n\nchartData.temperature.push(parseFloat(msg.tempVal));\nchartData.upper_threshold.push(27.0)\nchartData.lower_threshold.push(25.0)\nchartData.labels.push(elapsed + \"s\");\n\nflow.set(\"chartData\", chartData);\n\nmsg.payload = [\n    {\n        series: [\"temperature\", \"upper threshold\", \"lower threshold\"],\n        data: [chartData.temperature, chartData.upper_threshold, chartData.lower_threshold],\n        labels: chartData.labels\n    }\n];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1330,
+        "y": 740,
+        "wires": [
+            [
+                "e9724093feb24fc3"
+            ]
+        ]
+    },
+    {
+        "id": "9fae4b5ec72ad8f3",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "servorep report pub",
+        "func": "msg.report = \"<br>Smart actuator write confirmation received.\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1250,
+        "y": 240,
+        "wires": [
+            [
+                "e0c9f5b746bb752e",
+                "37b426f5fec3ff94"
+            ]
+        ]
+    },
+    {
+        "id": "ef614776a2a2047e",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "sensorrep report rec",
+        "func": "msg.report = \"<br>Smart sensor data received: \" + Number(msg.tempVal).toFixed(2) + \" C\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1360,
+        "y": 680,
+        "wires": [
+            [
+                "e0c9f5b746bb752e",
+                "c7fac5bd12fba22f"
+            ]
+        ]
+    },
+    {
+        "id": "e0c9f5b746bb752e",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "manage reports",
+        "func": "let oldText = flow.get(\"reportText\") || \"\";\nlet newMsg = msg.report;\nlet updatedText = oldText + newMsg;\n\nflow.set(\"reportText\", updatedText);\nmsg.report = updatedText;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1960,
+        "y": 460,
+        "wires": [
+            [
+                "bd2f8668814290c0"
+            ]
+        ]
+    },
+    {
+        "id": "d0f926a2de72d198",
+        "type": "debug",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "temp debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "tempVal",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1330,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "f7d019ea56b37ddc",
+        "type": "switch",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "check reply",
+        "property": "typeId",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "2,1,2",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 970,
+        "y": 680,
+        "wires": [
+            [
+                "14916c6ba005df38"
+            ]
+        ]
+    },
+    {
+        "id": "1fa6aabeccab1490",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "servoreq pub thru",
+        "func": "// servoreq = { # actuator movement request\n//   \"netSvcType\" : 2, # transducer access services\n//   \"setSvcId\" : 7, # write to channel of TIM\n//   \"msgType\" : 1, # command\n//   \"msgLength\" : 77, # bytes\n//   \"appId\" : appId,\n//   \"ncapId\" : servoId,\n//   \"timId\" : rpiId,\n//   \"channelId\" : 1,\n//   \"samplingMode\" : 5, # continuous\n//   \"dataValue\" : 0,\n//   \"timeout\" : 60,\n// }\n\nvar buf = new Buffer(81);\nbuf[0] = 2; // netSvcType\nbuf[1] = 7; // netSvcId\nbuf[2] = 1; // msgType\nbuf[3] = 77; // msgLength\nbuf[4] = 0x04; // UUID appId 0\nbuf[5] = 0x10; // 1\nbuf[6] = 0x00; // 2\nbuf[7] = 0x00; // 3\nbuf[8] = 0x27; // 4\nbuf[9] = 0x00; // 5\nbuf[10] = 0x00; // 6\nbuf[11] = 0x4D; // 7\nbuf[12] = 0x00; // 8\nbuf[13] = 0x00; // 9\nbuf[14] = 0x00; // 10\nbuf[15] = 0x07; // 11\nbuf[16] = 0xE9; // 12\nbuf[17] = 0x00; // 13\nbuf[18] = 0x00; // 14\nbuf[19] = 0x00; // 15\nbuf[20] = 0x04; // UUID ncapId 0\nbuf[21] = 0x10; // 1\nbuf[22] = 0x00; // 2\nbuf[23] = 0x00; // 3\nbuf[24] = 0x27; // 4\nbuf[25] = 0x00; // 5\nbuf[26] = 0x00; // 6\nbuf[27] = 0x4D; // 7\nbuf[28] = 0x00; // 8\nbuf[29] = 0x00; // 9\nbuf[30] = 0x03; // 10\nbuf[31] = 0x07; // 11\nbuf[32] = 0xE9; // 12\nbuf[33] = 0x00; // 13\nbuf[34] = 0x00; // 14\nbuf[35] = 0x00; // 15\nbuf[36] = 0x04; // UUID timId 0\nbuf[37] = 0x10; // 1\nbuf[38] = 0x00; // 2\nbuf[39] = 0x00; // 3\nbuf[40] = 0x27; // 4\nbuf[41] = 0x00; // 5\nbuf[42] = 0x00; // 6\nbuf[43] = 0x4D; // 7\nbuf[44] = 0x00; // 8\nbuf[45] = 0x00; // 9\nbuf[46] = 0x01; // 10\nbuf[47] = 0x07; // 11\nbuf[48] = 0xE9; // 12\nbuf[49] = 0x00; // 13\nbuf[50] = 0x00; // 14\nbuf[51] = 0x00; // 15\nbuf[52] = 1; // channelId 0\nbuf[53] = 0; // 1\nbuf[54] = 5; // samplingMode 0\nbuf[55] = 0; // dataValue 0\nbuf[56] = 0; // 1\nbuf[57] = 0; // 2\nbuf[58] = 0; // 3\nbuf[59] = 0; // 4\nbuf[60] = 0; // 5\nbuf[61] = 0; // 6\nbuf[62] = 0; // 7\nbuf[63] = 0; // 8\nbuf[64] = 0; // 9\nbuf[65] = 0; // 10\nbuf[66] = 0; // 11\nbuf[67] = 0; // 12\nbuf[68] = 0; // 13\nbuf[69] = 0; // 14\nbuf[70] = 0; // 15\nbuf[71] = 0x00 // timeout 0\nbuf[72] = 0x3C // 1\nbuf[73] = 0; // 2\nbuf[74] = 0; // 3\nbuf[75] = 0; // 4\nbuf[76] = 0; // 5\nbuf[77] = 0; // 6\nbuf[78] = 0; // 7\nbuf[79] = 0; // 8\nbuf[80] = 0; // 9\n\nmsg.payload = buf;\n\nif (msg.tempVal < 25) {\n    msg.report = \" --> Smart actuator (heat) write request published.\";\n}\nelse if (msg.tempVal > 27) {\n    msg.report = \" --> Smart actuator (cool) write request published.\";\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1790,
+        "y": 720,
+        "wires": [
+            [
+                "1a8c255963d0b643",
+                "e0c9f5b746bb752e"
+            ]
+        ]
+    },
+    {
+        "id": "a1669055c9a7ed75",
+        "type": "switch",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "check reply",
+        "property": "typeId",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "2,7,2",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1050,
+        "y": 240,
+        "wires": [
+            [
+                "9fae4b5ec72ad8f3"
+            ]
+        ]
+    },
+    {
+        "id": "37b426f5fec3ff94",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "actuate on",
+        "func": "msg.actuate = 1;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1530,
+        "y": 240,
+        "wires": [
+            [
+                "2ee87318797e8d59",
+                "41371173febb260a"
+            ]
+        ]
+    },
+    {
+        "id": "2ee87318797e8d59",
+        "type": "delay",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "3",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1700,
+        "y": 280,
+        "wires": [
+            [
+                "75f98cd5262b54d1"
+            ]
+        ]
+    },
+    {
+        "id": "75f98cd5262b54d1",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "actuate off",
+        "func": "msg.actuate = 0;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1870,
+        "y": 280,
+        "wires": [
+            [
+                "41371173febb260a"
+            ]
+        ]
+    },
+    {
+        "id": "1c75a719132a512b",
+        "type": "ui_button",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "button",
+        "group": "48885e856f401f42",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Publish sensor data request!",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "dummy",
+        "payloadType": "str",
+        "topic": "payload",
+        "topicType": "msg",
+        "x": 490,
+        "y": 520,
+        "wires": [
+            [
+                "7f79d7b26ffb16fa"
+            ]
+        ]
+    },
+    {
+        "id": "41371173febb260a",
+        "type": "ui_gauge",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "Servo",
+        "group": "6142b9cee65f7ad9",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Actuator",
+        "label": "On/Off",
+        "format": "{{msg.actuate}}",
+        "min": 0,
+        "max": "1",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 2030,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "1cce5cba26e23059",
+        "type": "ui_gauge",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "",
+        "group": "6142b9cee65f7ad9",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Temperature Sensor",
+        "label": "degrees C",
+        "format": "{{msg.tempVal}}",
+        "min": "20",
+        "max": "30",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1360,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "e9724093feb24fc3",
+        "type": "ui_chart",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "temp graph",
+        "group": "a4f6bdf374c38d10",
+        "order": 1,
+        "width": 14,
+        "height": 10,
+        "label": "Temperature vs Time",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "20",
+        "ymax": "32",
+        "removeOlder": 1,
+        "removeOlderPoints": "1000",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#000000",
+            "#ff8080",
+            "#80ffff",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1550,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bd2f8668814290c0",
+        "type": "ui_template",
+        "z": "dbbfb8a1ee1c3552",
+        "group": "48885e856f401f42",
+        "name": "textbox",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<div id=\"logBox\" style=\"height:450px; overflow-y:auto; white-space:pre-wrap;\">\n    <div id=\"logContent\">{{msg.report}}</div>\n</div>\n\n<script>\n    (function(scope) {\n        scope.$watch('msg.report', function(newVal) {\n            const logBox = document.getElementById('logBox');\n            if (logBox) {\n                logContent.innerHTML += '<br>' + newVal;\n                logBox.scrollTop = logBox.scrollHeight;\n            }\n        });\n    })(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 2140,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c7fac5bd12fba22f",
+        "type": "switch",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "check temp",
+        "property": "tempVal",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "gt",
+                "v": "27.000",
+                "vt": "num"
+            },
+            {
+                "t": "lt",
+                "v": "25.000",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1590,
+        "y": 680,
+        "wires": [
+            [
+                "1fa6aabeccab1490",
+                "f6770c1d22783e8d"
+            ],
+            [
+                "1fa6aabeccab1490",
+                "f6770c1d22783e8d"
+            ]
+        ]
+    },
+    {
+        "id": "540dbf01c28202b6",
+        "type": "delay",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": ".25",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 1050,
+        "y": 460,
+        "wires": [
+            [
+                "bb968932c9897e47",
+                "e0c9f5b746bb752e"
+            ]
+        ]
+    },
+    {
+        "id": "5b98a4121de759b6",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "Array2Str",
+        "func": "msg.typeId = Object.values(msg.payload).slice(0, 3).join(\",\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 240,
+        "wires": [
+            [
+                "a1669055c9a7ed75"
+            ]
+        ]
+    },
+    {
+        "id": "cf73446b8881a138",
+        "type": "function",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "Array2Str",
+        "func": "msg.typeId = Object.values(msg.payload).slice(0, 3).join(\",\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 800,
+        "y": 680,
+        "wires": [
+            [
+                "f7d019ea56b37ddc"
+            ]
+        ]
+    },
+    {
+        "id": "f6770c1d22783e8d",
+        "type": "debug",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "servoreq debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1780,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "33d9aab6a34de767",
+        "type": "debug",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "sensorreq debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "01bb15fe5fb3ae07",
+        "type": "ui_spacer",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "spacer",
+        "group": "6142b9cee65f7ad9",
+        "order": 1,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "0185c8523bb216da",
+        "type": "ui_spacer",
+        "z": "dbbfb8a1ee1c3552",
+        "name": "spacer",
+        "group": "6142b9cee65f7ad9",
+        "order": 3,
+        "width": 6,
+        "height": 1
+    },
+    {
+        "id": "cdf78fdef9bd8a15",
+        "type": "mqtt-broker",
+        "name": "HiveMQTT",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "48885e856f401f42",
+        "type": "ui_group",
+        "name": "Notifications",
+        "tab": "8fa141ace7688248",
+        "order": 1,
+        "disp": false,
+        "width": "14",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6142b9cee65f7ad9",
+        "type": "ui_group",
+        "name": "Gauge",
+        "tab": "8fa141ace7688248",
+        "order": 3,
+        "disp": false,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "a4f6bdf374c38d10",
+        "type": "ui_group",
+        "name": "Graphing",
+        "tab": "8fa141ace7688248",
+        "order": 2,
+        "disp": false,
+        "width": 14,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8fa141ace7688248",
+        "type": "ui_tab",
+        "name": "Digital Twin Testbed",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c5e87b6067d951de",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.5"
+        }
+    }
+]
